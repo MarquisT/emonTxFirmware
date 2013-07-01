@@ -28,7 +28,7 @@
 
 //CT 1 is always enabled
 const int CT2 = 1;                                                      // Set to 1 to enable CT channel 2
-const int CT3 = 1;                                                      // Set to 1 to enable CT channel 3
+const int CT3 = 0;                                                      // Set to 1 to enable CT channel 3
 
 #define freq RF12_433MHZ                                                // Frequency of RF12B module can be RF12_433MHZ, RF12_868MHZ or RF12_915MHZ. You should use the one matching the module you have.433MHZ, RF12_868MHZ or RF12_915MHZ. You should use the one matching the module you have.
 const int nodeID = 10;                                                  // emonTx RFM12B node ID
@@ -64,14 +64,20 @@ void setup()
   Serial.print(" Network: "); 
   Serial.println(networkGroup);
   
-  ct1.voltageTX(234.26, 1.7);                                         // ct.voltageTX(calibration, phase_shift) - make sure to select correct calibration for AC-AC adapter  http://openenergymonitor.org/emon/modules/emontx/firmware/calibration
-  ct1.currentTX(1, 111.1);                                            // Setup emonTX CT channel (channel (1,2 or 3), calibration)
-                                                                      // CT Calibration factor = CT ratio / burden resistance
-  ct2.voltageTX(234.26, 1.7);                                         // CT Calibration factor = (100A / 0.05A) x 18 Ohms
-  ct2.currentTX(2, 111.1);
+  if (CT1) {
+    ct1.voltageTX(234.26, 1.7);                                         // ct.voltageTX(calibration, phase_shift) - make sure to select correct calibration for AC-AC adapter  http://openenergymonitor.org/emon/modules/emontx/firmware/calibration
+    ct1.currentTX(1, 111.1);                                            // Setup emonTX CT channel (channel (1,2 or 3), calibration)
+  }  // CT Calibration factor = CT ratio / burden resistance
+ 
+  if (CT2) {
+    ct2.voltageTX(234.26, 1.7);                                         // CT Calibration factor = (100A / 0.05A) x 18 Ohms
+    ct2.currentTX(2, 111.1);
+  }
   
-  ct3.voltageTX(234.26, 1.7);
-  ct3.currentTX(3, 111.1);
+  if (CT3) {
+    ct3.voltageTX(234.26, 1.7);
+    ct3.currentTX(3, 111.1);
+  }
   
   rf12_initialize(nodeID, freq, networkGroup);                          // initialize RF
   rf12_sleep(RF12_SLEEP);

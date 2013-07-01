@@ -23,7 +23,7 @@ void setup()
   Serial.begin(9600);
 
   sensors.begin();
-  
+  Serial.println("In the setup");
   DeviceAddress tmp_address;
   int numberOfDevices = sensors.getDeviceCount();
   
