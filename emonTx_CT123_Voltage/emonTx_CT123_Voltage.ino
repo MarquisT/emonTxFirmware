@@ -78,26 +78,16 @@ void setup()
   Serial.print(" Network: "); 
   Serial.println(networkGroup);
   
-<<<<<<< HEAD
-  if (CT1) {
-    ct1.voltageTX(234.26, 1.7);                                         // ct.voltageTX(calibration, phase_shift) - make sure to select correct calibration for AC-AC adapter  http://openenergymonitor.org/emon/modules/emontx/firmware/calibration
-    ct1.currentTX(1, 111.1);                                            // Setup emonTX CT channel (channel (1,2 or 3), calibration)
-  }  // CT Calibration factor = CT ratio / burden resistance
- 
-  if (CT2) {
-    ct2.voltageTX(234.26, 1.7);                                         // CT Calibration factor = (100A / 0.05A) x 18 Ohms
-    ct2.currentTX(2, 111.1);
-  }
-=======
+
   ct1.voltageTX(228.268, 1.7);                                         // ct.voltageTX(calibration, phase_shift) - make sure to select correct calibration for AC-AC adapter  http://openenergymonitor.org/emon/modules/emontx/firmware/calibration. Default is set for Ideal Power voltage adapter. 
   ct1.currentTX(1, 111.1);                                            // Setup emonTX CT channel (channel (1,2 or 3), calibration)
-                                                                      // CT Calibration factor = CT ratio / burden resistance
-  ct2.voltageTX(234.26, 1.7);                                         // CT Calibration factor = (100A / 0.05A) x 18 Ohms
-  ct2.currentTX(2, 111.1);
->>>>>>> upstream/master
   
+  if(CT2){                                                                    // CT Calibration factor = CT ratio / burden resistance
+    ct2.voltageTX(228.268, 1.7);                                         // CT Calibration factor = (100A / 0.05A) x 18 Ohms
+    ct2.currentTX(2, 111.1);
+  }
   if (CT3) {
-    ct3.voltageTX(234.26, 1.7);
+    ct3.voltageTX(228.268, 1.7);
     ct3.currentTX(3, 111.1);
   }
   
