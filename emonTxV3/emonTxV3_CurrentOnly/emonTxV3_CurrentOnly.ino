@@ -24,7 +24,7 @@
 ISR(WDT_vect) { Sleepy::watchdogEvent(); }     // Attached JeeLib sleep function to Atmega328 watchdog -enables MCU to be put into sleep mode inbetween readings to reduce power consumption 
 
 #include "EmonLib.h"                     // Include Emon Library
-EnergyMonitor ct1, ct2, ct3, ct4;        // Create two instances
+EnergyMonitor ct1, ct2, ct3;//, ct4;        // Create two instances
 
 #define FILTERSETTLETIME 5000         //  Time (ms) to allow the filters to settle before sending data
 
@@ -32,12 +32,12 @@ EnergyMonitor ct1, ct2, ct3, ct4;        // Create two instances
 const int nodeID = 10;                                                          // emonTx RFM12B node ID
 const int networkGroup = 210;  
 
-typedef struct { int power1, power2, power3, power4, battery; } PayloadTX;     // create structure - a neat way of packaging data for RF comms
+typedef struct { int power1, power2, battery; } PayloadTX;     // create structure - a neat way of packaging data for RF comms
   PayloadTX emontx; 
 
 boolean settled = false;
 const int LEDpin=6;                                                            //emonTx V3 LED
-boolean CT1, CT2, CT3, CT4; 
+boolean CT1, CT2, CT3; 
 
 
 
@@ -48,17 +48,17 @@ void setup()
   
   if (analogRead(1) > 0) CT1 = 1;               //check to see if CT is connected to CT1 input, if so enable that channel
   if (analogRead(2) > 0) CT2 = 1;               //check to see if CT is connected to CT2 input, if so enable that channel
-  if (analogRead(3) > 0) CT3 = 1;               //check to see if CT is connected to CT3 input, if so enable that channel
-  if (analogRead(4) > 0) CT4 = 1;               //check to see if CT is connected to CT4 input, if so enable that channel
+  //if (analogRead(3) > 0) CT3 = 1;               //check to see if CT is connected to CT3 input, if so enable that channel
+  //if (analogRead(4) > 0) CT4 = 1;               //check to see if CT is connected to CT4 input, if so enable that channel
   
   Serial.begin(9600);
   Serial.println("emonTx V3 Current Only Example");
   
   if (CT1) ct1.current(1, 90.909);             // CT channel 1, calibration.  calibration (2000 turns / 22 Ohm burden resistor = 90.909)
   if (CT2) ct2.current(2, 90.909);             // CT channel 2, calibration.
-  if (CT3) ct3.current(3, 90.909);             // CT channel 3, calibration. 
+  //if (CT3) ct3.current(3, 90.909);             // CT channel 3, calibration. 
   //CT 3 is high accuracy @ low power -  4.5kW Max 
-  if (CT4) ct4.current(4, 16.66);             // CT channel 4, calibration.    calibration (2000 turns / 120 Ohm burden resistor = 16.66)
+  //if (CT4) ct4.current(4, 16.66);             // CT channel 4, calibration.    calibration (2000 turns / 120 Ohm burden resistor = 16.66)
   
  
   pinMode(LEDpin, OUTPUT);
@@ -72,7 +72,7 @@ void setup()
 
 void loop()
 {
-  
+  //Serial.print("In Loop");
   if (CT1) {
   emontx.power1 = ct1.calcIrms(1480)*240.0;   // Calculate Apparent Power 1 assuming 240Vrms AC - 1480 is  number of samples
   Serial.print(emontx.power1);  
@@ -83,26 +83,27 @@ void loop()
   Serial.print(emontx.power2);  
   }
   
-  if (CT3) {
-  emontx.power3 = ct3.calcIrms(1480)*240.0;   // Calculate Apparent Power 3 assuming 240Vrms AC - 1480 is  number of samples
-  Serial.print(emontx.power3);  
-  }
-  
+  //if (CT3) {
+  //emontx.power3 = ct3.calcIrms(1480)*240.0;   // Calculate Apparent Power 3 assuming 240Vrms AC - 1480 is  number of samples
+  //Serial.print(emontx.power3);  
+  //}
+  /*
   if (CT4) {
   emontx.power4 = ct4.calcIrms(1480)*240.0;   // Calculate Apparent Power 4 assuming 240Vrms AC - 1480 is  number of samples
   Serial.print(emontx.power4);  
-  }
+  }*/
   
   emontx.battery = ct1.readVcc();                                        //read emonTx battey (supply voltage after MPC1700 3V3 vreg on emonTxV3)
   
   Serial.print(" "); Serial.print(emontx.battery);
   Serial.println(); delay(100);
-  
+  Serial.print("C");
   // because millis() returns to zero after 50 days ! 
   if (!settled && millis() > FILTERSETTLETIME) settled = true;
-
+  Serial.println("A");
   if (settled)                                                            // send data only after filters have settled
   { 
+    //Serial.println("B");
     send_rf_data();                                                       // *SEND RF DATA* - see emontx_lib
     digitalWrite(LEDpin, HIGH); delay(5); digitalWrite(LEDpin, LOW);      // flash LED
     emontx_sleep(5);                                                      // sleep or delay in seconds - see emontx_lib
@@ -119,6 +120,7 @@ void send_rf_data()
   // mode 3 (full powerdown) can only be used with 258 CK startup fuses
   rf12_sendWait(2);
   rf12_sleep(RF12_SLEEP);
+ // Serial.println("Sent");
 }
 
 void emontx_sleep(int seconds) {
